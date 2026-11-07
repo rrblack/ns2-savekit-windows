@@ -1,0 +1,37 @@
+name: offline install
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.13.0'
+      - name: Fetch the pinned host (not redistributed here)
+        shell: bash
+        run: |
+          rev=fc2a2932ec77e31715dbb6616bf04e942f21079b
+          curl -fsSL -o "$RUNNER_TEMP/host.zip" "https://gitlab.com/BermTheSequel/ns2jb2/-/archive/$rev/ns2jb2-$rev.zip"
+          cd "$RUNNER_TEMP" && unzip -q host.zip
+          echo "HOST=$RUNNER_TEMP/ns2jb2-$rev" >> "$GITHUB_ENV"
+      - name: Install into a fresh path with spaces and run the offline fixture
+        shell: bash
+        run: node install.cjs "$HOST" "$RUNNER_TEMP/Installed Copy/ns2jb2 savekit"
+      - name: Refuse an existing destination
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/Already Here"
+          if node install.cjs "$HOST" "$RUNNER_TEMP/Already Here"; then exit 1; fi
+      - name: Installed modules match the reviewed build
+        shell: bash
+        run: node tests/overlays.cjs "$RUNNER_TEMP/Installed Copy/ns2jb2 savekit"

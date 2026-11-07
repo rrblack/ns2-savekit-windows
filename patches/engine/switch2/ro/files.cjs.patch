@@ -1,0 +1,10 @@
+--- a/engine/switch2/ro/files.cjs
++++ b/engine/switch2/ro/files.cjs
+@@ -130,6 +130,7 @@
+             } else stale = {name, size: length, sha256: hash(current)};
+           } finally { await s.close(child); }
+           if (stale) {
++            check(donor.mount === 'tmp', 'Refusing to remove an existing donor-name file from the application save: /' + name);
+             donor.pendingStaleRemoval = stale; await save();
+             const removed = await pathCall(name, 1);
+             check(!removed.result, 'Stale donor /' + name + ' removal failed');

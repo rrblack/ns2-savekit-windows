@@ -1,0 +1,14 @@
+--- a/engine/lib/bridge.cjs
++++ b/engine/lib/bridge.cjs
+@@ -11,7 +11,10 @@
+   };
+   async function handle(request) {
+     const {command} = request;
+-    if (command === 'status') return {ready: !native.connection.error, calls: native.calls};
++    if (command === 'status') {
++      const error = native.connection.error;
++      return {ready: !error, calls: native.calls, ...(error ? {error: String(error.message || error)} : {})};
++    }
+     if (command === 'call') {
+       const reply = await native.call(request.offset, ...request.args);
+       return {result: reply.result.toString(), output: reply.output.toString('base64')};

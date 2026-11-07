@@ -1,0 +1,8 @@
+{
+  "engine/shared/ipc.cjs": "20005b0965c143acdbd1663e0ff3ff76d1e0af095dd1355649e7fc43e8650e19",
+  "engine/lib/bridge.cjs": "79a3a5e389ccf29086f594d45f0fc9d840729c825ed4ef85da44fea20d349176",
+  "engine/switch2/ro/ncm.cjs": "72a4180264f8894b221ab7308a07fd05a7a3c777a2d0850d63d8c9d167ddfd13",
+  "engine/switch2/app/mounted-save.cjs": "ef1c36eda6e4dcc23757256d4803fc21501b4925e3812668dcba0cebd1c1dc0d",
+  "engine/switch2/cleanup-scratch.cjs": "c55760558140de78d8585218df3136fd579edcaa9dc027a2974565ae72afee43",
+  "engine/switch2/ro/files.cjs": "fb57c532b0f5d36d6bfe1b9091f4208e3d0318ec8e83ca551943aa491fe38eb0"
+}

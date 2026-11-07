@@ -1,0 +1,29 @@
+--- a/engine/switch2/cleanup-scratch.cjs
++++ b/engine/switch2/cleanup-scratch.cjs
+@@ -5,6 +5,12 @@
+ 
+ const gapScratch = entry => entry.name.startsWith('NS2_GAP');
+ 
++function checkHostSave(entries, donorUsesSave) {
++  const conflict = entries.find(entry => gapScratch(entry) ||
++    (donorUsesSave && ['main', 'main.npdm'].includes(entry.name)));
++  check(!conflict, 'Existing SmileBASIC save path requires inspection before cleanup: /' + conflict?.name);
++}
++
+ function scratchDeleteCommand(type) {
+   if (type === 0) return 4; // DeleteDirectoryRecursively
+   if (type === 1) return 1; // DeleteFile
+@@ -31,6 +37,7 @@
+     for (const name of mountNames) {
+       const handle = await mounted.cloneMountedFilesystem(s, name);
+       const root = await filesystem.listDirectory(s, handle, '/', 4096);
++      if (name === 'save') checkHostSave(root, !mountNames.includes('tmp'));
+       const gaps = root.filter(gapScratch).map(item => ({name, path: '/' + item.name}));
+       proof.previous.push(...gaps);
+       for (const record of gaps) {
+@@ -54,4 +61,4 @@
+   return proof;
+ }
+ 
+-module.exports = {main, gapScratch, scratchDeleteCommand};
++module.exports = {main, gapScratch, scratchDeleteCommand, checkHostSave};

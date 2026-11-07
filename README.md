@@ -174,8 +174,9 @@ Carry-forward requires a matching nonzero account UID across both inventories, i
 | Evidence | Where it came from |
 | --- | --- |
 | 780 legacy IPC packet comparisons, mixed-descriptor byte offsets, NCM filters, host-save collision guards, missing-tmp mount inspection, the pinned savekit CLI and child reproducing the old wrong-UID result, finish/lock handling, and an exporter run over seven synthetic archives (tampering, empty, partial, locked, carry-forward, stale run, transport failure) | `tests/check.cjs`, run by the installer. Rerun for this repository with Node 24.13.0 on Linux from a clean clone into a path with spaces. CI runs it on `ubuntu-latest` and `windows-latest` (Windows named pipe). |
-| The six installed modules are byte-identical to the reviewed build. Apart from the added `tests/upstream/LICENSE.txt`, the whole installed tree matches the reviewed installer's output. | Checked when this repository was built |
-| 28 host/engine tests and 59 checks across eight savekit test programs | Original offline review (see docs/REVIEW.md). Not rerun as part of this packaging. |
+| The six installed modules are byte-identical to the reviewed build. Apart from three added files under `backup-tests\` (`overlays.cjs`, `upstream\LICENSE.txt`, `upstream\README.md`), the whole installed tree matches the reviewed installer's output. | Checked when this repository was built |
+| The host's own 28 tests (18 in `test.cjs`, 10 retained/layout) against a copy holding the six patched modules | Rerun for this repository with Node 24.13.0 on Linux. They need the host's `test.cjs`, which isn't redistributed: copy it into a scratch copy of an installed folder and run `node --test test.cjs`. |
+| 59 checks across eight savekit test programs | Original offline review (see docs/REVIEW.md). Not rerun as part of this packaging. |
 | Hardware export | See *Tested hardware result* above |
 
 The line labeled **REPRODUCED upstream wrong-UID fallback** is a test of the pinned old savekit code, not of this exporter. The upstream fix is proposed in dougchansan/ns2-savekit.

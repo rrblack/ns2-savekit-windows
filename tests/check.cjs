@@ -178,6 +178,8 @@ async function runFixture(temp) {
   }
 }
 (async()=>{
-  const temp=await fs.mkdtemp(path.join(os.tmpdir(),'ns2-backup-test-'));
+  // Use the real long path: Windows %TEMP% is often an 8.3 short name (C:\Users\LONGNA~1),
+  // and the exporter only accepts a run folder whose real path matches its own location.
+  const temp=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'ns2-backup-test-')));
   try { await runFixture(temp); } finally {await fs.rm(temp,{recursive:true,force:true});}
 })().catch(e=>{console.error(e);process.exitCode=1;});

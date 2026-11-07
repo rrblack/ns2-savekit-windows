@@ -10,7 +10,7 @@ A read-only Switch 2 save exporter for Windows 11. It plugs into the BermTheSequ
 
 A Windows 11 user running Node 24.13.0 with the Japanese SmileBASIC 4 Demo 4.4.6 used the reviewed build on an actual Switch 2. The run listed 175 archives and verified 110. The Animal Crossing: New Horizons device archive verified with 89 files and 43,988,390 bytes. Exit 2 recorded coverage gaps. This shows that real exports work with that build. Restoring saves to the console, and other hardware, firmware or SmileBASIC configurations, have not been tested.
 
-This repository changes only how the reviewed build is delivered. The installer reproduces the six reviewed host modules byte for byte (`overlays.json` holds their SHA-256), and the backup client and tests are the reviewed files. The runtime behavior is the build that was tested on hardware.
+This repository changes only how the reviewed build is delivered. The installer reproduces the six reviewed host modules byte for byte (`overlays.json` holds their SHA-256), and `backup/` holds the reviewed client files unchanged. The runtime behavior is the build that was tested on hardware. The one code change since review is test-only: `tests/check.cjs` resolves its temporary folder to its real path so the fixture also passes where `%TEMP%` is an 8.3 short name (see below).
 
 ## Requirements
 
@@ -41,6 +41,8 @@ The installer:
 **If the destination already exists**, the installer stops without touching it. An existing destination is never adopted or replaced. Pick another new sibling, such as `"C:\Switch2\ns2jb2 savekit 2"`, and use that path in every later command. If the installer fails after creating the folder, don't launch that copy. Delete it, or keep it for diagnosis, and install to a fresh path.
 
 The installer doesn't run PowerShell scripts, change execution policy, install packages or contact the console. Your original checkout is only read.
+
+Use the installed folder through its real path: not an 8.3 short name (`C:\Users\LONGNA~1\…`), a junction or a symlink. The backup client refuses a run folder whose real path is not inside the folder it was started from, and stops with *Use the exact run folder printed by this installed host*. A plain folder such as `C:\Switch2\…` avoids this.
 
 To rerun only the offline fixture against an installed copy:
 
@@ -174,7 +176,7 @@ Carry-forward requires a matching nonzero account UID across both inventories, i
 | Evidence | Where it came from |
 | --- | --- |
 | 780 legacy IPC packet comparisons, mixed-descriptor byte offsets, NCM filters, host-save collision guards, missing-tmp mount inspection, the pinned savekit CLI and child reproducing the old wrong-UID result, finish/lock handling, and an exporter run over seven synthetic archives (tampering, empty, partial, locked, carry-forward, stale run, transport failure) | `tests/check.cjs`, run by the installer. Rerun for this repository with Node 24.13.0 on Linux from a clean clone into a path with spaces. CI runs it on `ubuntu-latest` and `windows-latest` (Windows named pipe). |
-| The six installed modules are byte-identical to the reviewed build. Apart from three added files under `backup-tests\` (`overlays.cjs`, `upstream\LICENSE.txt`, `upstream\README.md`), the whole installed tree matches the reviewed installer's output. | Checked when this repository was built |
+| The six installed modules are byte-identical to the reviewed build. The whole installed tree matches the reviewed installer's output, apart from three added files under `backup-tests\` (`overlays.cjs`, `upstream\LICENSE.txt`, `upstream\README.md`) and the one-line temp-path fix in `backup-tests\check.cjs`. | Checked when this repository was built |
 | The host's own 28 tests (18 in `test.cjs`, 10 retained/layout) against a copy holding the six patched modules | Rerun for this repository with Node 24.13.0 on Linux. They need the host's `test.cjs`, which isn't redistributed: copy it into a scratch copy of an installed folder and run `node --test test.cjs`. |
 | 59 checks across eight savekit test programs | Original offline review (see docs/REVIEW.md). Not rerun as part of this packaging. |
 | Hardware export | See *Tested hardware result* above |
